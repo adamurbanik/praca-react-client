@@ -15,13 +15,14 @@
 
 .App-header {
   background-color: #282c34;
-  min-height: 100vh;
+  min-height: 5vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+  padding-bottom: 50px;
 }
 
 .App-link {
@@ -35,4 +36,149 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.User-form-header {
+  height: 100vh;
+  background-color: lightblue;
+  color: white;
+}
+
+.User-form-component {
+  height: 100vh;
+}
+
+
+
+/* selektor uniwersalny */
+* {
+  /* color: blue; */
+}
+
+/* typ elementu */
+p, div {
+  color: red;
+}
+
+/* selektor klasy */
+.App-header {
+  color: yellow;
+}
+
+
+/* selektor atrybutu */
+[type="text"] {
+  background-color: red;
+}
+
+/* [href$="pl"] {
+  color:yellowgreen
+} */
+
+/* selektor rodzenstwa */
+.greetingContent input, div ~ label {
+ background: beige;
+}
+
+/* .greetingContent div + label {
+  background: black;
+} */
+
+/* pseudoelement */
+.someDiv:before {
+  content: "before";
+  color: yellowgreen;
+}
+
+.someDiv > p:first-letter {
+  color:aqua
+}
+
+.someDiv > p:first-line {
+  color:blueviolet
+}
+
+/* a:focus {
+  color:pink
+} */
+
+a:link {
+  color:brown
+}
+
+a:visited {
+  color:#61dafb
+}
+
+a:hover {
+  color: red
+}
+
+/* .someDiv a:nth-child(1) {
+  color:#282c34
+} */
+
+/* .someDiv :nth-child(2) {
+  color: blueviolet
+} */
+
+/* .someDiv:has(p) {
+  background-color:cadetblue;
+} */
+
+/*div a:only-of-type {*/
+/*  background-color:coral;*/
+/*}*/
+
+/*p:has(strong, span) {*/
+/*  color: blue;*/
+/*}*/
+
+/*:is(p, div) :is(strong, span) {*/
+/*  background-color: yellow;*/
+/*}*/
+
+/*:where(p, div) :where(strong, span) {*/
+/*  background: yellow;*/
+/*}*/
+
+/* .pDiv:has(strong):has(span) {
+  background: yellow;
+} */
+
+.pDiv:has(strong) {
+  background: yellow;
+}
+
+/* .pDiv :is(strong, span) {
+  background-color: greenyellow;
+} */
+
+/* .pDiv :where(.spanClass, .strongClass) {
+  background-color: yellow; 
+} */
+
+/*::marker {*/
+/*  content: "✔ ";*/
+/*  color: green;*/
+/*  font-size: 1.2em;*/
+/*}*/
+
+/*.someDiv p {*/
+/*  white-space: nowrap;*/
+/*}*/
+
+
+.greetingContent {
+  display: flex;
+  flex-direction: column;
+  background-color: aqua;
+  /*flex-wrap: wrap;*/
+  /*justify-content: flex-start;*/
+  align-items: flex-end;
+  /*align-content: center;*/
+}
+
+#karolId .karolClass span strong {
+  background-color: blue;
 }

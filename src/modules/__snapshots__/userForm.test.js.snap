@@ -1,0 +1,59 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UserForm test component renders correctly 1`] = `
+Array [
+  <header
+    className="User-form-header"
+  >
+    user form header
+    <button
+      onClick={[Function]}
+    >
+      Show User Form
+    </button>
+  </header>,
+  <div
+    className="User-form-component"
+  >
+    <label
+      htmlFor="address"
+    >
+      Address
+    </label>
+    <input
+      id="address"
+      onChange={[Function]}
+      value=""
+    />
+    <label
+      htmlFor="name"
+    >
+      Name
+    </label>
+    <input
+      id="name"
+      onChange={[Function]}
+      type="text"
+      value=""
+    />
+    <br />
+    <br />
+    <div>
+      GreetingUseCallback component
+    </div>
+    <br />
+    GreetingUseCallback render count: 
+    1
+    <br />
+    <br />
+    <button
+      onClick={[Function]}
+    >
+      handle submit
+    </button>
+    <br />
+    <br />
+    <div />
+  </div>,
+]
+`;
