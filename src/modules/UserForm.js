@@ -11,11 +11,9 @@ import {
 } from 'react';
 // import { GreetingMemo } from '../components/GreetingMemo';
 // import { GreetingDeferred } from '../components/GreetingDeferred';
-import { GreetingUseCallback } from '../components/GreetingUseCallback';
 import { Clients } from './Clients';
-import { GreetingRef } from '../components/GreetingRef';
-import { incrementCount, getCount } from '../hooks/useSingleton';
 import { useSingleton2 } from '../hooks/useSingleton';
+import { useClients } from '../common/hooks/useClients';
 
 const GreetingDeferred = lazy(() => import('../components/GreetingDeferred'));
 
@@ -36,30 +34,6 @@ const personDetailsGlobal = {
   adressSecond: 'no-adres',
 };
 
-const defaultClients = [
-  {
-    name: 'billing-consumer',
-  },
-  {
-    name: 'billing.production',
-  },
-  {
-    name: 'calling-main',
-  },
-  {
-    name: 'demo-consumer',
-  },
-  {
-    name: 'demo-producer',
-  },
-  {
-    name: 'test-consumer',
-  },
-  {
-    name: 'testing-1',
-  },
-];
-
 const UserForm = ({ personDetails }) => {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
@@ -67,15 +41,10 @@ const UserForm = ({ personDetails }) => {
   const deferredName = useDeferredValue(name);
   const userFormRef = useRef(null);
   const { getInstance } = useSingleton2();
-  const [clients, setClients] = useState([]);
-  // const [] = useTryApi();
+  const { clients, error, isLoading, isFetching } = useClients();
 
   // let personName = ''
   let key = 0;
-
-  useEffect(() => {
-    setClients(defaultClients);
-  }, []);
 
   let somePerson = {
     key: 0,
@@ -223,7 +192,14 @@ const UserForm = ({ personDetails }) => {
         {/*<GreetingUseCallback onSubmit={cachedOnSubmit} />*/}
         <br />
         <br />
-        <Clients clients={clients} person={person} name={name} />
+        <Clients
+          clients={clients}
+          person={person}
+          name={name}
+          isLoading={isLoading}
+          error={error}
+          isFetching={isFetching}
+        />
       </div>
     </>
   );

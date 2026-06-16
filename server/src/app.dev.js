@@ -1,0 +1,25 @@
+import express from 'express';
+import cors from 'cors';
+import clientsRoutes from './routes/clients.routes.js';
+import { requestLogger } from './middleware/requestLogger.js';
+import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
+
+/** Dev-only: samo API z CORS dla CRA dev server (:3000) */
+export const createDevApp = () => {
+  const app = express();
+
+  app.use(cors({ origin: 'http://localhost:3000' }));
+  app.use(express.json());
+  app.use(requestLogger);
+
+  app.get('/api/health', (_req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
+  app.use('/api/clients', clientsRoutes);
+
+  app.use(notFoundHandler);
+  app.use(errorHandler);
+
+  return app;
+};

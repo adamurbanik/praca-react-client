@@ -1,74 +1,118 @@
+import { memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {memo, useContext, useEffect, useRef} from 'react';
-import { DataContext } from '../common/providers/DataProvider';
-import {GreetingMemo} from "../components/GreetingMemo";
-// import { saveCall } from '../hooks/repo';
+import { GreetingMemo } from '../components/GreetingMemo';
+import { useClientMutations } from '../common/hooks/useClients';
 import repo from '../hooks/repo';
 
-let count = 0;
-
-const ClientsComponent = ({ clients, person, name }) => {
-  // const {
-  //   state: { clients },
-  // } = useContext(DataContext);
-
+const ClientsComponent = ({
+  clients,
+  person,
+  name,
+  isLoading,
+  error,
+  isFetching,
+}) => {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const getOnet = async () => {
-      const response = await fetch('www.onet.pl');
-    };
-
-    getOnet();
-
-    return () => {
-      console.log('Clients component will unmount');
-    };
-  }, []);
-
-  useEffect(() => {
-    count = count + 1;
-  });
-
+  const [newClientName, setNewClientName] = useState('');
+  const { addClient, removeClient } = useClientMutations();
 
   const navigateToGreetingRef = () => {
-    navigate('/ref')
+    navigate('/ref');
+  };
+
+  const handleAddClient = async (event) => {
+    event.preventDefault();
+    if (!newClientName.trim()) return;
+
+    try {
+      await addClient.mutateAsync(newClientName.trim());
+      setNewClientName('');
+    } catch (err) {
+      console.error('Failed to add client:', err.message);
+    }
+  };
+
+  const handleDeleteClient = async (id) => {
+    try {
+      await removeClient.mutateAsync(id);
+    } catch (err) {
+      console.error('Failed to delete client:', err.message);
+    }
+  };
+
+  if (isLoading) {
+    return <p>Loading clients from Node.js API...</p>;
+  }
+
+  if (error) {
+    return (
+      <p style={{ color: 'salmon' }}>
+        API error: {error}. Uruchom backend: <code>cd server && npm run dev</code>
+      </p>
+    );
   }
 
   return (
-    <>
-      <div>
-        {clients.map((client, index) => (
-          <div key={index}>
-            <div>client: {client.name}</div>
-          </div>
+    <section>
+      <h3>Clients (REST API → Node.js)</h3>
+      {isFetching && <small>Refreshing...</small>}
+
+      <ul style={{ listStyle: 'none', padding: 0 }}>
+        {clients.map((client) => (
+          <li
+            key={client.id}
+            style={{
+              display: 'flex',
+              gap: '1rem',
+              alignItems: 'center',
+              marginBottom: '0.5rem',
+            }}
+          >
+            <span>
+              #{client.id} — {client.name}
+            </span>
+            <button
+              type="button"
+              onClick={() => handleDeleteClient(client.id)}
+              disabled={removeClient.isPending}
+            >
+              Delete
+            </button>
+          </li>
         ))}
-        <br />
-        <div>count: {count}</div>
+      </ul>
 
-        <button onClick={navigateToGreetingRef}>Navigate Home page</button>
+      <form onSubmit={handleAddClient} style={{ marginTop: '1rem' }}>
+        <input
+          type="text"
+          placeholder="New client name"
+          value={newClientName}
+          onChange={(e) => setNewClientName(e.target.value)}
+        />
+        <button type="submit" disabled={addClient.isPending}>
+          Add client (POST)
+        </button>
+      </form>
 
-        <button onClick={repo.saveCall}>Save call</button>
+      <br />
+      <button type="button" onClick={navigateToGreetingRef}>
+        Navigate Home page
+      </button>
+      <button type="button" onClick={repo.saveCall}>
+        Save call
+      </button>
 
-        <GreetingMemo person={person} name={name} />
-
-      </div>
-    </>
+      <GreetingMemo person={person} name={name} />
+    </section>
   );
 };
 
-const arePropsEqual = (prevProps, nextProps) => {
-  // console.log('clients props clients', clients);
-  // console.log('clients props person', person);
-  // console.log('clients props name', name);
+const arePropsEqual = (prevProps, nextProps) =>
+  prevProps.clients === nextProps.clients &&
+  prevProps.name === nextProps.name &&
+  prevProps.person === nextProps.person &&
+  prevProps.isLoading === nextProps.isLoading &&
+  prevProps.error === nextProps.error &&
+  prevProps.isFetching === nextProps.isFetching;
 
-  // console.log('clients prevProps clients', prevProps.clients === nextProps.clients);
-  // console.log('clients prevProps clients', prevProps.name === nextProps.name);
-  // console.log('clients prevProps clients', prevProps.person === nextProps.person);
-  // console.log(prevProps.clients === nextProps.clients && prevProps.name === nextProps.name && prevProps.person === nextProps.person);
-
-
-
-  return prevProps.clients === nextProps.clients && prevProps.name === nextProps.name && prevProps.person === nextProps.person
-}
-export const Clients = memo(ClientsComponent, arePropsEqual)
+export const Clients = memo(ClientsComponent, arePropsEqual);
