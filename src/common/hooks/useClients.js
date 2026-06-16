@@ -1,9 +1,13 @@
-import { useQuery } from '@tanstack/react-query';
-import { getClientsData } from '../api/methods';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  createClient,
+  deleteClient,
+  getClientsData,
+} from '../api/methods';
 
 export const useClients = () => {
   const {
-    data: clients,
+    data: clients = [],
     error,
     isLoading,
     isFetching,
@@ -22,7 +26,30 @@ export const useClients = () => {
 
   // isLoading - kiedy nie ma cachu i react query fetchuje dane
   // isFetching - react query sprawdza czy na serwerze sa nowe dane, niezależnie od tego czy są dane w cache czy nie
+  
+  return {
+    clients,
+    error: error?.message ?? null,
+    isLoading,
+    isFetching,
+  };
+};
 
+export const useClientMutations = () => {
+  const queryClient = useQueryClient();
 
-  return { clients, error, isLoading, isFetching };
+  const invalidateClients = () =>
+    queryClient.invalidateQueries({ queryKey: ['clients'] });
+
+  const addClient = useMutation({
+    mutationFn: createClient,
+    onSuccess: invalidateClients,
+  });
+
+  const removeClient = useMutation({
+    mutationFn: deleteClient,
+    onSuccess: invalidateClients,
+  });
+
+  return { addClient, removeClient };
 };

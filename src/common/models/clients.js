@@ -1,23 +1,9 @@
 export const clients = [
-  {
-    name: 'billing-consumer',
-  },
-  {
-    name: 'billing.production',
-  },
-  {
-    name: 'calling-main',
-  },
-  {
-    name: 'demo-consumer',
-  },
-  {
-    name: 'demo-producer',
-  },
-  {
-    name: 'test-consumer',
-  },
-  {
-    name: 'testing-1',
-  },
+  { id: 1, name: 'billing-consumer' },
+  { id: 2, name: 'billing.production' },
+  { id: 3, name: 'calling-main' },
+  { id: 4, name: 'demo-consumer' },
+  { id: 5, name: 'demo-producer' },
+  { id: 6, name: 'test-consumer' },
+  { id: 7, name: 'testing-1' },
 ];
