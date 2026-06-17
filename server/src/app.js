@@ -2,6 +2,7 @@ import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import clientsRoutes from './routes/clients.routes.js';
+import authRoutes from './routes/auth.routes.js';
 import { requestLogger } from './middleware/requestLogger.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
 
@@ -18,6 +19,7 @@ export const createApp = () => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
   });
 
+  app.use('/api/auth', authRoutes);
   app.use('/api/clients', clientsRoutes);
 
   app.use(express.static(buildPath));
