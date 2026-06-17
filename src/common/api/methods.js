@@ -1,3 +1,5 @@
+import { authHeaders } from './auth';
+
 const API_BASE = '/api/clients';
 
 async function handleResponse(response) {
@@ -22,19 +24,22 @@ export const getClientById = (id) =>
 export const createClient = (name) =>
   fetch(API_BASE, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify({ name }),
   }).then(handleResponse);
 
 export const updateClient = (id, name) =>
   fetch(`${API_BASE}/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify({ name }),
   }).then(handleResponse);
 
 export const deleteClient = (id) =>
-  fetch(`${API_BASE}/${id}`, { method: 'DELETE' }).then(handleResponse);
+  fetch(`${API_BASE}/${id}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  }).then(handleResponse);
 
 export const checkApiHealth = () =>
   fetch('/api/health').then(handleResponse);

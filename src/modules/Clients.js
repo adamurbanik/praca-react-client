@@ -2,6 +2,7 @@ import { memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GreetingMemo } from '../components/GreetingMemo';
 import { useClientMutations } from '../common/hooks/useClients';
+import { clearToken, getToken, login } from '../common/api/auth';
 import repo from '../hooks/repo';
 
 const ClientsComponent = ({
@@ -14,10 +15,28 @@ const ClientsComponent = ({
 }) => {
   const navigate = useNavigate();
   const [newClientName, setNewClientName] = useState('');
+  const [email, setEmail] = useState('admin@example.com');
+  const [password, setPassword] = useState('secret123');
+  const [isLoggedIn, setIsLoggedIn] = useState(() => Boolean(getToken()));
   const { addClient, removeClient } = useClientMutations();
 
   const navigateToGreetingRef = () => {
     navigate('/ref');
+  };
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    try {
+      await login(email, password);
+      setIsLoggedIn(true);
+    } catch (err) {
+      console.error('Login failed:', err.message);
+    }
+  };
+
+  const handleLogout = () => {
+    clearToken();
+    setIsLoggedIn(false);
   };
 
   const handleAddClient = async (event) => {
@@ -54,7 +73,32 @@ const ClientsComponent = ({
 
   return (
     <section>
-      <h3>Clients (REST API → Node.js)</h3>
+      <h3>Clients (REST API → Node.js + JWT)</h3>
+
+      {!isLoggedIn ? (
+        <form onSubmit={handleLogin} style={{ marginBottom: '1rem' }}>
+          <p>Zaloguj się (JWT), żeby dodawać/usuwać klientów:</p>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button type="submit">Login</button>
+        </form>
+      ) : (
+        <p>
+          Zalogowany: {email}{' '}
+          <button type="button" onClick={handleLogout}>
+            Logout
+          </button>
+        </p>
+      )}
+
       {isFetching && <small>Refreshing...</small>}
 
       <ul style={{ listStyle: 'none', padding: 0 }}>
@@ -74,7 +118,7 @@ const ClientsComponent = ({
             <button
               type="button"
               onClick={() => handleDeleteClient(client.id)}
-              disabled={removeClient.isPending}
+              disabled={removeClient.isPending || !isLoggedIn}
             >
               Delete
             </button>
@@ -89,7 +133,7 @@ const ClientsComponent = ({
           value={newClientName}
           onChange={(e) => setNewClientName(e.target.value)}
         />
-        <button type="submit" disabled={addClient.isPending}>
+        <button type="submit" disabled={addClient.isPending || !isLoggedIn}>
           Add client (POST)
         </button>
       </form>
