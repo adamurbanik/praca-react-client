@@ -5,6 +5,7 @@ import { dirname, join } from 'path';
 import clientsRoutes from './routes/clients.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import { requestLogger } from './middleware/requestLogger.js';
+import { sessionMiddleware } from './middleware/session.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -15,6 +16,7 @@ export const createApp = () => {
 
   app.use(express.json());
   app.use(cookieParser());
+  app.use(sessionMiddleware);
   app.use(requestLogger);
 
   app.get('/api/health', (_req, res) => {

@@ -1,45 +1,26 @@
-import jwt from 'jsonwebtoken';
 import { AppError } from '../errors/AppError.js';
-import { JWT_SECRET, TOKEN_COOKIE_NAME } from '../config/auth.config.js';
 
 /**
- * Middleware JWT — bramka przed chronionymi route'ami.
+ * Middleware sesji — bramka przed chronionymi route'ami.
  *
  * Flow:
  *   Request → auth → controller
  *              │
- *              ├─ brak httpOnly cookie z tokenem → 401
- *              ├─ jwt.verify() OK                → req.user, next()
- *              └─ token wygasł / sfałszowany     → 401
+ *              ├─ brak req.session.user → 401
+ *              └─ sesja aktywna         → req.user, next()
  *
- * Express NIE wie sam o JWT — to Ty mówisz mu:
+ * Express NIE wie sam o sesji — to Ty mówisz mu:
  *   router.post('/', auth, controller)
  *                      ^^^^
  *                      ten middleware musi wywołać next() albo next(err)
  */
 export const auth = (req, _res, next) => {
-  const token = req.cookies?.[TOKEN_COOKIE_NAME];
-
-  if (!token) {
+  if (!req.session?.user) {
     return next(new AppError('Missing or invalid session', 401));
   }
 
-  try {
-    const payload = jwt.verify(token, JWT_SECRET);
-
-    req.user = {
-      id: payload.sub,
-      email: payload.email,
-      role: payload.role,
-    };
-
-    next();
-  } catch (error) {
-    if (error.name === 'TokenExpiredError') {
-      return next(new AppError('Token expired', 401));
-    }
-    return next(new AppError('Invalid token', 401));
-  }
+  req.user = req.session.user;
+  next();
 };
 
 /**

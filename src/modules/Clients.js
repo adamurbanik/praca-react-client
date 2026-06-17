@@ -84,7 +84,7 @@ const ClientsComponent = ({
 
   return (
     <section>
-      <h3>Clients (REST API → Node.js + JWT)</h3>
+      <h3>Clients (REST API → Node.js + sessions)</h3>
 
       {isSessionLoading ? (
         <p>Sprawdzanie sesji...</p>

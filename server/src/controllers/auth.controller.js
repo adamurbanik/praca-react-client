@@ -1,20 +1,18 @@
 import { authService } from '../services/auth.service.js';
 import {
-  clearTokenCookieOptions,
-  TOKEN_COOKIE_NAME,
-  tokenCookieOptions,
+  clearSessionCookieOptions,
+  SESSION_COOKIE_NAME,
 } from '../config/auth.config.js';
 
 export const authController = {
   async login(req, res) {
-    const result = await authService.login(req.body);
-
-    res.cookie(TOKEN_COOKIE_NAME, result.token, tokenCookieOptions);
-    res.json({ user: result.user, expiresIn: result.expiresIn });
+    const result = await authService.login(req.body, req);
+    res.json({ user: result.user });
   },
 
-  async logout(_req, res) {
-    res.clearCookie(TOKEN_COOKIE_NAME, clearTokenCookieOptions);
+  async logout(req, res) {
+    await authService.logout(req);
+    res.clearCookie(SESSION_COOKIE_NAME, clearSessionCookieOptions);
     res.json({ ok: true });
   },
 

@@ -4,6 +4,7 @@ import cors from 'cors';
 import clientsRoutes from './routes/clients.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import { requestLogger } from './middleware/requestLogger.js';
+import { sessionMiddleware } from './middleware/session.js';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
 
 /** Dev-only: samo API z CORS dla CRA dev server (:3000) */
@@ -13,6 +14,7 @@ export const createDevApp = () => {
   app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
   app.use(express.json());
   app.use(cookieParser());
+  app.use(sessionMiddleware);
   app.use(requestLogger);
 
   app.get('/api/health', (_req, res) => {
