@@ -1,4 +1,5 @@
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import clientsRoutes from './routes/clients.routes.js';
@@ -13,6 +14,7 @@ export const createApp = () => {
   const app = express();
 
   app.use(express.json());
+  app.use(cookieParser());
   app.use(requestLogger);
 
   app.get('/api/health', (_req, res) => {

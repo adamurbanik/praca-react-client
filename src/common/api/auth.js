@@ -1,15 +1,26 @@
-const TOKEN_KEY = 'auth_token';
+const jsonHeaders = { 'Content-Type': 'application/json' };
 
-export const getToken = () => localStorage.getItem(TOKEN_KEY);
+/** @type {RequestInit} */
+const fetchOptions = {
+  credentials: 'include',
+};
 
-export const setToken = (token) => localStorage.setItem(TOKEN_KEY, token);
+export const checkSession = async () => {
+  const response = await fetch('/api/auth/me', fetchOptions);
 
-export const clearToken = () => localStorage.removeItem(TOKEN_KEY);
+  if (!response.ok) {
+    return null;
+  }
+
+  const data = await response.json();
+  return data.user;
+};
 
 export const login = async (email, password) => {
   const response = await fetch('/api/auth/login', {
+    ...fetchOptions,
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: jsonHeaders,
     body: JSON.stringify({ email, password }),
   });
 
@@ -18,15 +29,22 @@ export const login = async (email, password) => {
     throw new Error(body.error || `HTTP ${response.status}`);
   }
 
-  const data = await response.json();
-  setToken(data.token);
-  return data;
+  return response.json();
 };
 
-export const authHeaders = () => {
-  const token = getToken();
-  return {
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
+export const logout = async () => {
+  const response = await fetch('/api/auth/logout', {
+    ...fetchOptions,
+    method: 'POST',
+  });
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body.error || `HTTP ${response.status}`);
+  }
 };
+
+export const jsonFetchOptions = () => ({
+  ...fetchOptions,
+  headers: jsonHeaders,
+});

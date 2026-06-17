@@ -1,4 +1,4 @@
-import { authHeaders } from './auth';
+import { jsonFetchOptions } from './auth';
 
 const API_BASE = '/api/clients';
 
@@ -16,30 +16,30 @@ async function handleResponse(response) {
 }
 
 export const getClientsData = () =>
-  fetch(API_BASE).then(handleResponse);
+  fetch(API_BASE, jsonFetchOptions()).then(handleResponse);
 
 export const getClientById = (id) =>
-  fetch(`${API_BASE}/${id}`).then(handleResponse);
+  fetch(`${API_BASE}/${id}`, jsonFetchOptions()).then(handleResponse);
 
 export const createClient = (name) =>
   fetch(API_BASE, {
+    ...jsonFetchOptions(),
     method: 'POST',
-    headers: authHeaders(),
     body: JSON.stringify({ name }),
   }).then(handleResponse);
 
 export const updateClient = (id, name) =>
   fetch(`${API_BASE}/${id}`, {
+    ...jsonFetchOptions(),
     method: 'PUT',
-    headers: authHeaders(),
     body: JSON.stringify({ name }),
   }).then(handleResponse);
 
 export const deleteClient = (id) =>
   fetch(`${API_BASE}/${id}`, {
+    ...jsonFetchOptions(),
     method: 'DELETE',
-    headers: authHeaders(),
   }).then(handleResponse);
 
 export const checkApiHealth = () =>
-  fetch('/api/health').then(handleResponse);
+  fetch('/api/health', jsonFetchOptions()).then(handleResponse);
