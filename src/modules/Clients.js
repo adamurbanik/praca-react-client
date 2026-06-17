@@ -1,8 +1,8 @@
-import { memo, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GreetingMemo } from '../components/GreetingMemo';
 import { useClientMutations } from '../common/hooks/useClients';
-import { clearToken, getToken, login } from '../common/api/auth';
+import { checkSession, login, logout } from '../common/api/auth';
 import repo from '../hooks/repo';
 
 const ClientsComponent = ({
@@ -17,8 +17,15 @@ const ClientsComponent = ({
   const [newClientName, setNewClientName] = useState('');
   const [email, setEmail] = useState('admin@example.com');
   const [password, setPassword] = useState('secret123');
-  const [isLoggedIn, setIsLoggedIn] = useState(() => Boolean(getToken()));
+  const [user, setUser] = useState(null);
+  const [isSessionLoading, setIsSessionLoading] = useState(true);
   const { addClient, removeClient } = useClientMutations();
+
+  useEffect(() => {
+    checkSession()
+      .then((sessionUser) => setUser(sessionUser))
+      .finally(() => setIsSessionLoading(false));
+  }, []);
 
   const navigateToGreetingRef = () => {
     navigate('/ref');
@@ -27,16 +34,20 @@ const ClientsComponent = ({
   const handleLogin = async (event) => {
     event.preventDefault();
     try {
-      await login(email, password);
-      setIsLoggedIn(true);
+      const data = await login(email, password);
+      setUser(data.user);
     } catch (err) {
       console.error('Login failed:', err.message);
     }
   };
 
-  const handleLogout = () => {
-    clearToken();
-    setIsLoggedIn(false);
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setUser(null);
+    } catch (err) {
+      console.error('Logout failed:', err.message);
+    }
   };
 
   const handleAddClient = async (event) => {
@@ -75,9 +86,11 @@ const ClientsComponent = ({
     <section>
       <h3>Clients (REST API → Node.js + JWT)</h3>
 
-      {!isLoggedIn ? (
+      {isSessionLoading ? (
+        <p>Sprawdzanie sesji...</p>
+      ) : !user ? (
         <form onSubmit={handleLogin} style={{ marginBottom: '1rem' }}>
-          <p>Zaloguj się (JWT), żeby dodawać/usuwać klientów:</p>
+          <p>Zaloguj się (httpOnly cookie), żeby dodawać/usuwać klientów:</p>
           <input
             type="email"
             value={email}
@@ -92,7 +105,7 @@ const ClientsComponent = ({
         </form>
       ) : (
         <p>
-          Zalogowany: {email}{' '}
+          Zalogowany: {user.email} ({user.role}){' '}
           <button type="button" onClick={handleLogout}>
             Logout
           </button>
@@ -118,7 +131,7 @@ const ClientsComponent = ({
             <button
               type="button"
               onClick={() => handleDeleteClient(client.id)}
-              disabled={removeClient.isPending || !isLoggedIn}
+              disabled={removeClient.isPending || !user}
             >
               Delete
             </button>
@@ -133,7 +146,7 @@ const ClientsComponent = ({
           value={newClientName}
           onChange={(e) => setNewClientName(e.target.value)}
         />
-        <button type="submit" disabled={addClient.isPending || !isLoggedIn}>
+        <button type="submit" disabled={addClient.isPending || !user}>
           Add client (POST)
         </button>
       </form>
